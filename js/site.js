@@ -157,6 +157,27 @@
       });
     });
 
+    /* 1e-fs. Mobile full-screen interactive phones (maps are scroll-locked in-page on touch) */
+    var fsOpen = null;
+    function setFullscreen(stage, on) {
+      if (!stage) return;
+      stage.classList.toggle('is-mobile-fs', on);
+      document.body.classList.toggle('has-mobile-fs', on);
+      fsOpen = on ? stage : null;
+      U.fitPhones();
+      global.dispatchEvent(new Event('resize'));
+    }
+    $$('[data-fs-open]').forEach(function (b) {
+      b.addEventListener('click', function () { setFullscreen(b.closest('.phone-stage'), true); });
+    });
+    $$('[data-fs-close]').forEach(function (b) {
+      b.addEventListener('click', function () { setFullscreen(b.closest('.phone-stage'), false); });
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && fsOpen) setFullscreen(fsOpen, false); });
+    global.addEventListener('resize', function () {
+      if (fsOpen && global.innerWidth > 768) setFullscreen(fsOpen, false);
+    });
+
     /* 1e. CallDO-Style Simple Onboarding Tap Switcher (Change Location vs Route Simulation) */
     var onboardTabs = $$('[data-onboard-tab]');
     var onboardPanels = $$('[data-onboard-panel]');

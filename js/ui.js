@@ -86,13 +86,24 @@
     setTimeout(function () { t.classList.remove('on'); setTimeout(function () { t.remove(); }, 250); }, ms || 2200);
   }
 
-  /** Scale each .phone-fit so the 380px device always fits its column. */
+  /** Scale each .phone-fit so the 380px device (+12px outer bezel/buttons) always fits its column and viewport. */
   function fitPhones() {
     var changed = false;
+    var docW = Math.max(260, (document.documentElement.clientWidth || global.innerWidth || 380) - 36);
     $$('.phone-fit').forEach(function (f) {
-      var avail = f.parentElement.clientWidth;
+      var stage = f.parentElement;
+      if (stage && stage.classList.contains('is-mobile-fs')) {
+        var fsS = clamp(Math.min(global.innerWidth / 392, global.innerHeight / 776), 0.4, 1.3);
+        if (Math.abs((parseFloat(f.style.getPropertyValue('--s')) || 0) - fsS) > 0.002) {
+          f.style.setProperty('--s', fsS.toFixed(4));
+          changed = true;
+        }
+        return;
+      }
+      var stageW = stage ? stage.clientWidth : docW;
+      var avail = Math.min(stageW || docW, docW);
       var want = parseFloat(f.getAttribute('data-max') || '1');
-      var s = clamp(avail / 380, 0.55, want);
+      var s = clamp(avail / 392, 0.55, want);
       if (Math.abs((parseFloat(f.style.getPropertyValue('--s')) || 0) - s) > 0.002) {
         f.style.setProperty('--s', s.toFixed(4));
         changed = true;

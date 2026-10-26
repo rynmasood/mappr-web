@@ -5,7 +5,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 
 /* ── device frame ── */
-.phone-fit { --s: 1; position: relative; width: calc(380px * var(--s)); height: calc(760px * var(--s)); margin-inline: auto; flex: none; }
+.phone-fit { --s: 1; position: relative; width: calc(380px * var(--s)); height: calc(760px * var(--s)); max-width: 100%; margin-inline: auto; flex: none; -webkit-tap-highlight-color: transparent; }
 .phone {
   position: absolute; left: 0; top: 0; width: 380px; height: 760px; padding: 10px;
   border-radius: 54px; background: #0f1113;
@@ -27,8 +27,9 @@
   position: relative; width: 360px; height: 740px; border-radius: 44px; overflow: hidden; isolation: isolate;
   background: #F3F4F1; color: var(--on-surface); font-family: Poppins, system-ui, -apple-system, 'Segoe UI', sans-serif;
   font-size: 14px; line-height: 1.35; text-align: left; -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
-:where(.screen) *, :where(.screen) *::before, :where(.screen) *::after { box-sizing: border-box; }
+:where(.screen) *, :where(.screen) *::before, :where(.screen) *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 :where(.screen) button { font: inherit; color: inherit; border: 0; background: none; padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 :where(.screen) svg.ic { display: block; flex: none; }
 :where(.screen) svg.ic path { vector-effect: none; }

@@ -58,8 +58,17 @@
     this.view.layers.push(function (ctx, v) { self._draw(ctx, v); });
     this.view.onFrame = function (dt, t) { self._frame(dt, t); };
     this.newRoute(true);
-    global.addEventListener('mp-fit', function () { self._measure(); });
-    new ResizeObserver(function () { self._measure(); }).observe(this.q('.rn-panel'));
+    global.addEventListener('mp-fit', function () {
+      self._measure();
+      if (self.st.state === 'idle') self._fit(true);
+    });
+    if (global.ResizeObserver) {
+      new ResizeObserver(function () { self._measure(); }).observe(this.q('.rn-panel'));
+      new ResizeObserver(function () {
+        self._measure();
+        if (self.st.state === 'idle') self._fit(true);
+      }).observe(this.screen);
+    }
   }
 
   RouteDemo.prototype = {
@@ -248,8 +257,9 @@
 
     _measure: function () {
       var scr = this.screen, panel = this.q('[data-panel]'), reveal = this.q('[data-reveal]'), settings = this.q('[data-settings]');
+      var sh = scr.clientHeight || 740;
       var fixed = panel.offsetHeight - reveal.offsetHeight;
-      var cap = 740 - 20 - 100 - fixed;
+      var cap = sh - 20 - 100 - fixed;
       this.rv.max = Math.max(0, Math.min(settings.offsetHeight, cap));
       if (!this.rv.drag && !this.rv.raf) { this.rv.x = this.st.expanded ? this.rv.max : 0; this._applyReveal(); }
     },
@@ -358,13 +368,14 @@
     _fit: function (instant) {
       var v = this.view, pts = this.R.pts, x0 = 1e18, x1 = -1e18, y0 = 1e18, y1 = -1e18;
       pts.forEach(function (p) { x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
-      var freeTop = 104, freeBot = 740 - 20 - (this.q('[data-panel]').offsetHeight || 205) - 14;
-      var w = 360 - 70, h = Math.max(180, freeBot - freeTop - 24);
+      var sw = this.screen.clientWidth || 360, sh = this.screen.clientHeight || 740;
+      var freeTop = 104, freeBot = sh - 20 - (this.q('[data-panel]').offsetHeight || 205) - 14;
+      var w = sw - 70, h = Math.max(180, freeBot - freeTop - 24);
       var s = Math.max(0.58, Math.min(1.35, Math.min(w / (x1 - x0 + 40), h / (y1 - y0 + 40))));
       var cy = (freeTop + freeBot) / 2;
       this._camTarget = null;
       this.fitState = { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, s: s, ay: cy };
-      this.anchorY = cy; v.setAnchorPx(180, cy);
+      this.anchorY = cy; v.setAnchorPx(sw / 2, cy);
       v.tilt.style.transition = 'transform .7s cubic-bezier(.2,.8,.2,1)';
       v.tilt.style.transform = 'none';
       v.cam.bearing = 0;
@@ -422,6 +433,7 @@
       this.pos = pos;
 
       // follow camera (heading-up, tilted 45°) — keep blue dot in the open map area above the control sheet
+      var sw = this.screen.clientWidth || 360, sh = this.screen.clientHeight || 740;
       if (st.state === 'active' && !st.paused && !v.dragging) {
         var k = 1 - Math.exp(-dt * 9);
         if (!v.fly) {
@@ -431,10 +443,10 @@
         var db = angDiff(v.cam.bearing, this.heading);
         v.cam.bearing += db * Math.min(1, dt * 4.2);
         var panelH = this.q('[data-panel]').offsetHeight || 260;
-        var freeBot = 740 - 20 - panelH;
-        var navAnchorY = Math.max(200, Math.min(315, 96 + (freeBot - 96) * 0.62));
+        var freeBot = sh - 20 - panelH;
+        var navAnchorY = Math.max(180, Math.min(sh * 0.46, 96 + (freeBot - 96) * 0.62));
         this.anchorY += (navAnchorY - this.anchorY) * Math.min(1, dt * 4);
-        v.setAnchorPx(180, this.anchorY);
+        v.setAnchorPx(sw / 2, this.anchorY);
       } else if (st.state === 'active' && st.paused) {
         // hold
       } else if (st.state === 'completed') {
@@ -443,7 +455,7 @@
       if (st.state === 'idle') {
         v.cam.bearing += angDiff(v.cam.bearing, 0) * Math.min(1, dt * 5);
         this.anchorY += (this.fitState.ay - this.anchorY) * Math.min(1, dt * 5);
-        v.setAnchorPx(180, this.anchorY);
+        v.setAnchorPx(sw / 2, this.anchorY);
       }
 
       // live UI
