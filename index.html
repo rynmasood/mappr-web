@@ -209,12 +209,9 @@
               <div class="screen" id="phone-location" aria-label="Interactive Mappr Change Location Screen"></div>
             </div>
           </div>
-          <button type="button" class="fs-open-btn" data-fs-open aria-label="Open change location demo in full screen">
+          <button type="button" class="fs-open-btn" data-fs-open data-fs-title="Change Location · Interactive" aria-label="Open change location demo in full screen">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             <span>Try in Full Screen</span>
-          </button>
-          <button type="button" class="fs-close-btn" data-fs-close aria-label="Close full screen">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
           </button>
         </div>
       </div>
@@ -295,12 +292,9 @@
                 <div class="screen" id="phone-route" aria-label="Interactive Mappr Route Simulation Screen"></div>
               </div>
             </div>
-            <button type="button" class="fs-open-btn" data-fs-open aria-label="Open route simulation in full screen">
+            <button type="button" class="fs-open-btn" data-fs-open data-fs-title="Route Simulation · Interactive" aria-label="Open route simulation in full screen">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
               <span>Try in Full Screen</span>
-            </button>
-            <button type="button" class="fs-close-btn" data-fs-close aria-label="Close full screen">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
             </button>
           </div>
         </div>
@@ -651,6 +645,26 @@
       </div>
     </div>
   </footer>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Mobile Interactive Full Screen Modal
+       Direct child of <body> to bypass any transform / filter containing block
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div id="mobile-fs-modal" class="mobile-fs-modal" hidden aria-modal="true" role="dialog" aria-label="Interactive Demo Full Screen">
+    <div class="mobile-fs-header">
+      <div class="mobile-fs-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        <span id="mobile-fs-title">Interactive Demo</span>
+      </div>
+      <button type="button" class="mobile-fs-close" id="mobile-fs-close" aria-label="Exit Full Screen">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        <span>Exit Full Screen</span>
+      </button>
+    </div>
+    <div class="mobile-fs-viewport" id="mobile-fs-viewport">
+      <div class="mobile-fs-slot" id="mobile-fs-slot"></div>
+    </div>
+  </div>
 
   <!-- Scripts -->
   <script src="js/mapengine.js" defer></script>

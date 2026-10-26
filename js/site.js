@@ -51,6 +51,7 @@
     }
 
     function updateNavScroll() {
+      if (document.body.classList.contains('mobile-fs-open')) return;
       var y = global.scrollY || 0;
 
       // State 1 & 2: Unscrolled (y <= 24) vs Scrolled frosted pill (y > 24)
@@ -157,46 +158,99 @@
       });
     });
 
-    /* 1e-fs. Mobile full-screen interactive phones (maps are scroll-locked in-page on touch) */
-    var fsOpen = null, fsSpacer = null, fsScrollY = 0;
-    function setFullscreen(stage, on) {
-      if (!stage) return;
-      var root = document.documentElement;
-      if (on) {
-        fsScrollY = global.pageYOffset || root.scrollTop || 0;
-        // keep the layout height so the page doesn't collapse/jump when the stage leaves the flow
-        fsSpacer = document.createElement('div');
-        fsSpacer.style.height = stage.offsetHeight + 'px';
-        fsSpacer.setAttribute('aria-hidden', 'true');
-        stage.parentNode.insertBefore(fsSpacer, stage);
-        stage.classList.add('is-mobile-fs');
-        // iOS-safe scroll lock: pin the body in place at the current offset
-        root.style.scrollBehavior = 'auto';
-        document.body.classList.add('has-mobile-fs');
-        document.body.style.top = (-fsScrollY) + 'px';
-        fsOpen = stage;
-      } else {
-        stage.classList.remove('is-mobile-fs');
-        document.body.classList.remove('has-mobile-fs');
-        document.body.style.top = '';
-        if (fsSpacer && fsSpacer.parentNode) fsSpacer.parentNode.removeChild(fsSpacer);
-        fsSpacer = null;
-        fsOpen = null;
-        global.scrollTo(0, fsScrollY);
-        root.style.scrollBehavior = '';
+    /* 1e-fs. Mobile Full-Screen Interactive Phone Modal */
+    var fsModal = document.getElementById('mobile-fs-modal');
+    var fsSlot = document.getElementById('mobile-fs-slot');
+    var fsTitle = document.getElementById('mobile-fs-title');
+    var fsCloseBtn = document.getElementById('mobile-fs-close');
+    var currentActivePhone = null;
+    var currentPlaceholder = null;
+
+    function openMobileFullscreen(stage, customTitle) {
+      if (!fsModal || !fsSlot || !stage) return;
+      var phoneFit = $('.phone-fit', stage);
+      if (!phoneFit) return;
+
+      if (typeof setMobileMenu === 'function') {
+        setMobileMenu(false);
       }
+
+      var screenEl = $('.screen', phoneFit);
+      var isRoute = screenEl && screenEl.id === 'phone-route';
+      if (fsTitle) {
+        fsTitle.textContent = customTitle || (isRoute ? 'Route Simulation · Interactive' : 'Change Location · Interactive');
+      }
+
+      // Preserve layout in-page with a matching invisible placeholder so nothing shifts
+      var placeholder = document.createElement('div');
+      placeholder.className = 'phone-fit-placeholder';
+      placeholder.style.width = (phoneFit.offsetWidth || 380) + 'px';
+      placeholder.style.height = (phoneFit.offsetHeight || 760) + 'px';
+      placeholder.setAttribute('aria-hidden', 'true');
+
+      phoneFit.parentNode.insertBefore(placeholder, phoneFit);
+      fsSlot.innerHTML = '';
+      fsSlot.appendChild(phoneFit);
+
+      currentActivePhone = phoneFit;
+      currentPlaceholder = placeholder;
+
+      fsModal.removeAttribute('hidden');
+      document.documentElement.classList.add('mobile-fs-open');
+      document.body.classList.add('mobile-fs-open');
+
       U.fitPhones();
       global.dispatchEvent(new Event('resize'));
     }
-    $$('[data-fs-open]').forEach(function (b) {
-      b.addEventListener('click', function () { setFullscreen(b.closest('.phone-stage'), true); });
+
+    function closeMobileFullscreen() {
+      if (!fsModal || !currentActivePhone || !currentPlaceholder) return;
+
+      if (currentPlaceholder.parentNode) {
+        currentPlaceholder.parentNode.insertBefore(currentActivePhone, currentPlaceholder);
+        currentPlaceholder.parentNode.removeChild(currentPlaceholder);
+      }
+      currentPlaceholder = null;
+      currentActivePhone = null;
+
+      fsModal.setAttribute('hidden', '');
+      document.documentElement.classList.remove('mobile-fs-open');
+      document.body.classList.remove('mobile-fs-open');
+
+      U.fitPhones();
+      global.dispatchEvent(new Event('resize'));
+    }
+
+    $$('[data-fs-open]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var stage = btn.closest('.phone-stage');
+        var title = btn.getAttribute('data-fs-title');
+        openMobileFullscreen(stage, title);
+      });
     });
-    $$('[data-fs-close]').forEach(function (b) {
-      b.addEventListener('click', function () { setFullscreen(b.closest('.phone-stage'), false); });
+
+    if (fsCloseBtn) {
+      fsCloseBtn.addEventListener('click', closeMobileFullscreen);
+    }
+
+    if (fsModal) {
+      fsModal.addEventListener('click', function (e) {
+        if (e.target === fsModal || e.target.id === 'mobile-fs-viewport' || e.target.id === 'mobile-fs-slot') {
+          closeMobileFullscreen();
+        }
+      });
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && fsModal && !fsModal.hasAttribute('hidden')) {
+        closeMobileFullscreen();
+      }
     });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && fsOpen) setFullscreen(fsOpen, false); });
+
     global.addEventListener('resize', function () {
-      if (fsOpen && global.innerWidth > 768) setFullscreen(fsOpen, false);
+      if (fsModal && !fsModal.hasAttribute('hidden') && global.innerWidth > 768) {
+        closeMobileFullscreen();
+      }
     });
 
     /* 1e. CallDO-Style Simple Onboarding Tap Switcher (Change Location vs Route Simulation) */

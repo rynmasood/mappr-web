@@ -91,15 +91,19 @@
     var changed = false;
     var docW = Math.max(260, (document.documentElement.clientWidth || global.innerWidth || 380) - 36);
     $$('.phone-fit').forEach(function (f) {
-      var stage = f.parentElement;
-      if (stage && stage.classList.contains('is-mobile-fs')) {
-        var fsS = clamp(Math.min(global.innerWidth / 392, global.innerHeight / 776), 0.4, 1.3);
+      if (f.closest && f.closest('#mobile-fs-modal')) {
+        var vp = document.getElementById('mobile-fs-viewport') || f.parentElement;
+        var padW = 28, padH = 16;
+        var availW = Math.max(220, (vp ? vp.clientWidth : global.innerWidth) - padW);
+        var availH = Math.max(320, (vp ? vp.clientHeight : (global.innerHeight - 80)) - padH);
+        var fsS = clamp(Math.min(availW / 392, availH / 776), 0.4, 1.25);
         if (Math.abs((parseFloat(f.style.getPropertyValue('--s')) || 0) - fsS) > 0.002) {
           f.style.setProperty('--s', fsS.toFixed(4));
           changed = true;
         }
         return;
       }
+      var stage = f.parentElement;
       var stageW = stage ? stage.clientWidth : docW;
       var avail = Math.min(stageW || docW, docW);
       var want = parseFloat(f.getAttribute('data-max') || '1');
