@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mappr — Fake GPS Location Changer &amp; Route Simulator for Android (No Root)</title>
+  <meta name="description" content="Change your Android GPS location in one tap without root. Protect location privacy, test geofencing and location-based apps as a developer or QA tester, prank friends, and simulate realistic multi-stop GPS routes.">
+  <meta name="keywords" content="fake gps location, mock location app android, change gps location without root, gps route simulator android, location spoofer, android developer mock location testing, mask gps location privacy, fake live location">
+  <meta property="og:title" content="Mappr — Fake GPS Location Changer &amp; Route Simulator for Android">
+  <meta property="og:description" content="One-tap fake GPS location changer and realistic route simulator for Android. No root required—built for privacy, developer QA testing, and location simulation.">
+  <meta property="og:image" content="assets/icon.png">
+  <link rel="icon" type="image/png" href="assets/icon.png">
+
+  <!-- Structured Data (SoftwareApplication + FAQPage for Search Intent SEO) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Mappr — Fake GPS Location & Route Simulator",
+        "operatingSystem": "Android",
+        "applicationCategory": "UtilitiesApplication",
+        "installUrl": "https://play.google.com/store/apps/details?id=com.raycode.mockloc&utm_source=raycode.me&utm_medium=referral&utm_campaign=mappr_website&utm_content=structured_data",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "description": "One-tap Android mock location changer and multi-stop GPS route simulator without root."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Does Mappr require an internet connection?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Certain features require an internet connection, like search and route. Saved routes and searches are stored on your device and can be accessed offline."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does it require Developer Options?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, and a proper setup guide is available for different OEMs."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does my device need to be rooted?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is my location stored server-side?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No, nothing is stored server-side. You can see the privacy policy at https://raycode.me/Mappr/privacy.html."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/app-ui.css">
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Top Scroll Progress Bar + CallDO-Style Floating Pill Navigation
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="cd-progress-wrap" aria-hidden="true">
+    <div class="cd-progress-bar" id="cd-progress-bar"></div>
+  </div>
+
+  <div class="cd-nav-wrap" id="cd-nav-wrap">
+    <nav class="cd-nav" id="cd-nav" aria-label="Primary Navigation">
+      <!-- Brand / Logo (scrolls smoothly to top) -->
+      <a href="#hero-demo" class="cd-brand" id="cd-brand-top" aria-label="Mappr Home">
+        <div class="cd-brand-box">
+          <img src="assets/icon.png" alt="Mappr App Icon" width="40" height="40">
+        </div>
+        <span class="cd-brand-name">Mappr</span>
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <div class="cd-nav-links">
+        <a href="#hero-demo" class="cd-nav-link active" data-nav-sec="hero-demo">Change Location</a>
+        <a href="#route-lab" class="cd-nav-link" data-nav-sec="route-lab">Route Mode</a>
+        <a href="#how-it-works" class="cd-nav-link" data-nav-sec="how-it-works">How It Works</a>
+        <a href="#features" class="cd-nav-link" data-nav-sec="features">Why Fake GPS</a>
+        <a href="#faq" class="cd-nav-link" data-nav-sec="faq">FAQ</a>
+      </div>
+
+      <!-- Right CTA & Mobile Menu Toggle -->
+      <div class="cd-nav-actions">
+        <a href="https://play.google.com/store/apps/details?id=com.raycode.mockloc&amp;utm_source=raycode.me&amp;utm_medium=referral&amp;utm_campaign=mappr_website&amp;utm_content=nav_top" target="_blank" rel="noopener noreferrer" class="cd-btn-install">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 0 1 0 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/>
+          </svg>
+          <span>Google Play</span>
+        </a>
+
+        <button type="button" aria-label="Toggle menu" aria-expanded="false" class="cd-menu-toggle" id="cd-menu-toggle">
+          <svg class="ic-menu" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 5h16"></path>
+            <path d="M4 12h16"></path>
+            <path d="M4 19h16"></path>
+          </svg>
+          <svg class="ic-close" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none">
+            <path d="M18 6 6 18"></path>
+            <path d="m6 6 12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Mobile Dropdown Drawer (Toggled via #cd-menu-toggle) -->
+      <div class="cd-mobile-drawer" id="cd-mobile-drawer" hidden>
+        <a href="#hero-demo" class="cd-drawer-link" data-nav-sec="hero-demo">Change Location</a>
+        <a href="#route-lab" class="cd-drawer-link" data-nav-sec="route-lab">Route Mode</a>
+        <a href="#how-it-works" class="cd-drawer-link" data-nav-sec="how-it-works">How It Works</a>
+        <a href="#features" class="cd-drawer-link" data-nav-sec="features">Why Fake GPS</a>
+        <a href="#faq" class="cd-drawer-link" data-nav-sec="faq">FAQ</a>
+        <a href="mailto:rayyanmasterx@gmail.com" class="cd-drawer-link">Contact</a>
+        <a href="https://play.google.com/store/apps/details?id=com.raycode.mockloc&amp;utm_source=raycode.me&amp;utm_medium=referral&amp;utm_campaign=mappr_website&amp;utm_content=nav_drawer" target="_blank" rel="noopener noreferrer" class="cd-drawer-cta">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 0 1 0 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/>
+          </svg>
+          <span>Download on Google Play</span>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <main>
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Hero Section — Minimal Copy + Interactive Phone
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="hero" id="hero-demo">
+      <div class="hero-bg-map" id="hero-bg-map" aria-hidden="true"></div>
+      <div class="hero-bg-overlay" aria-hidden="true"></div>
+
+      <div class="container hero-grid">
+        <!-- Left Column: Clean Marketing Copy -->
+        <div class="hero-copy">
+          <h1 class="cd-reveal" style="--reveal-delay: 100ms; --reveal-y: 28px">
+            Simulate your GPS location to <span class="grad">any place in the world.</span>
+          </h1>
+
+          <p class="hero-lead cd-reveal" style="--reveal-delay: 200ms; --reveal-y: 28px">
+            No cluttered dashboards or complicated menus. Pan the map to drop the pin, tap <strong>Change</strong>, and your phone instantly reports the new spot—complete with favourite bookmarks, a scheduled auto-stop timer, and realistic route simulation.
+          </p>
+
+          <div class="hero-actions cd-reveal" style="--reveal-delay: 300ms; --reveal-y: 28px">
+            <a class="btn-play-badge" href="https://play.google.com/store/apps/details?id=com.raycode.mockloc&amp;utm_source=raycode.me&amp;utm_medium=referral&amp;utm_campaign=mappr_website&amp;utm_content=hero_badge" target="_blank" rel="noopener noreferrer" aria-label="Get it on Google Play">
+              <img src="assets/Component%203.svg" alt="Get it on Google Play" height="54">
+            </a>
+            <a class="btn-secondary" href="#route-lab">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/>
+              </svg>
+              <span>Try Route Mode</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Column: Clean Interactive Phone Frame -->
+        <div class="phone-stage cd-reveal" style="--reveal-delay: 250ms; --reveal-y: 40px">
+          <div class="stage-glow" aria-hidden="true"></div>
+          <div class="phone-fit" data-max="1">
+            <div class="phone">
+              <div class="screen" id="phone-location" aria-label="Interactive Mappr Change Location Screen"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Route Simulation Section — Interactive Phone UI + Minimal Highlights
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="route-lab-section" id="route-lab">
+      <div class="container">
+        <div class="section-header cd-reveal" style="--reveal-delay: 0ms; --reveal-y: 28px">
+          <div class="section-kicker">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+            <span>Route Simulation</span>
+          </div>
+          <h2 class="section-title">Drive Along Real Roads Right Inside the Map</h2>
+          <p class="section-sub">
+            Try the live control sheet on the phone below—adjust your speed, pull up the arrow handle to switch between Normal, Loop, and Patrol modes, and press Start.
+          </p>
+        </div>
+
+        <div class="route-lab-grid">
+          <!-- Left Column: Clean Feature Highlights -->
+          <div class="route-feature-list">
+            <div class="route-feature-item cd-reveal" style="--reveal-delay: 0ms; --reveal-y: 28px">
+              <div class="rf-head">
+                <span class="rf-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                </span>
+                <h3>Turn-by-Turn Navigation View</h3>
+              </div>
+              <p>
+                Plan routes with up to 25 stops and watch the live navigation camera follow your movement along the road with real-time remaining distance and estimated arrival time.
+              </p>
+            </div>
+
+            <div class="route-feature-item cd-reveal" style="--reveal-delay: 100ms; --reveal-y: 28px">
+              <div class="rf-head">
+                <span class="rf-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M14 6v2h3.59L5 20.59 6.41 22 19 9.41V13h2V6z"/></svg>
+                </span>
+                <h3>Corner Slowdown &amp; Real-Time Mode</h3>
+              </div>
+              <p>
+                Automatically eases your speed into bends and accelerates out of turns like a real driver, while Real-Time Mode subtly varies your pace between 70% and 120%.
+              </p>
+            </div>
+
+            <div class="route-feature-item cd-reveal" style="--reveal-delay: 200ms; --reveal-y: 28px">
+              <div class="rf-head">
+                <span class="rf-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                </span>
+                <h3>Normal, Loop &amp; Patrol Modes</h3>
+              </div>
+              <p>
+                Travel from start to finish once in Normal mode, restart from the beginning on arrival in Loop mode, or continuously patrol back and forth between start and destination.
+              </p>
+            </div>
+
+            <div class="route-feature-item cd-reveal" style="--reveal-delay: 300ms; --reveal-y: 28px">
+              <div class="rf-head">
+                <span class="rf-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
+                </span>
+                <h3>Fine-Grained GPS Realism</h3>
+              </div>
+              <p>
+                Expand the control sheet on the phone to customize horizontal GPS accuracy, natural signal drift, and elevation altitude.
+              </p>
+            </div>
+          </div>
+
+          <!-- Right Column: Interactive Route Simulation Phone -->
+          <div class="phone-stage cd-reveal" style="--reveal-delay: 200ms; --reveal-y: 40px">
+            <div class="phone-fit" data-max="1">
+              <div class="phone">
+                <div class="screen" id="phone-route" aria-label="Interactive Mappr Route Simulation Screen"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Simple Onboarding Section (CallDO-Style 3-Step Cards + Tap Switcher)
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="onboarding-section" id="how-it-works">
+      <div class="container">
+        <div class="section-header cd-reveal" style="--reveal-delay: 0ms; --reveal-y: 28px">
+          <div class="section-kicker">Simple Onboarding</div>
+          <h2 class="section-title">Ready in 3 Simple Steps</h2>
+          <p class="section-sub">
+            Tap below to switch between changing your location and running a route simulation.
+          </p>
+
+          <!-- Tap-Based Onboarding Mode Switcher -->
+          <div class="onboard-tabs-wrap">
+            <div class="onboard-tabs" role="tablist" aria-label="Onboarding Mode">
+              <button type="button" class="onboard-tab active" role="tab" aria-selected="true" data-onboard-tab="location">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                <span>Change Location</span>
+              </button>
+              <button type="button" class="onboard-tab" role="tab" aria-selected="false" data-onboard-tab="route">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/>
+                </svg>
+                <span>Route Simulation</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Panel 1: Change Location Onboarding -->
+        <div class="onboard-panel" data-onboard-panel="location" role="tabpanel">
+          <div class="onboard-grid">
+            <div class="onboard-line" aria-hidden="true"></div>
+
+            <!-- Step 1 -->
+            <div class="onboard-step-wrap cd-reveal" style="--reveal-delay: 0ms; --reveal-y: 28px">
+              <div class="onboard-card">
+                <div class="onboard-num">1</div>
+                <h3>Enable Permissions</h3>
+                <p>
+                  Activate Developer Mode and allow notification permission.
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="onboard-step-wrap cd-reveal" style="--reveal-delay: 150ms; --reveal-y: 28px">
+              <div class="onboard-card">
+                <div class="onboard-num">2</div>
+                <h3>Select Your Location</h3>
+                <p>
+                  Pan the map or search any address to drop the pin on your desired spot.
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 3 (Accent) -->
+            <div class="onboard-step-wrap cd-reveal" style="--reveal-delay: 300ms; --reveal-y: 28px">
+              <div class="onboard-card is-accent">
+                <div class="onboard-num">3</div>
+                <h3>Tap Change</h3>
+                <p>
+                  Voila! Tap the Change button and it will immediately change your location.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Panel 2: Route Simulation Onboarding -->
+        <div class="onboard-panel" data-onboard-panel="route" role="tabpanel" hidden>
+          <div class="onboard-grid">
+            <div class="onboard-line" aria-hidden="true"></div>
+
+            <!-- Step 1 -->
+            <div class="onboard-step-wrap">
+              <div class="onboard-card">
+                <div class="onboard-num">1</div>
+                <h3>Enable Permissions</h3>
+                <p>
+                  Activate Developer Mode and allow notification permission.
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="onboard-step-wrap">
+              <div class="onboard-card">
+                <div class="onboard-num">2</div>
+                <h3>Create Your Route</h3>
+                <p>
+                  Search or select your start, add waypoints, and set your end point to create a route.
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 3 (Accent) -->
+            <div class="onboard-step-wrap">
+              <div class="onboard-card is-accent">
+                <div class="onboard-num">3</div>
+                <h3>Start Simulation</h3>
+                <p>
+                  Tap Start to begin the simulation along your mapped route.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Why Using Fake GPS Location (SEO & Real-World Use Cases + Disclaimer)
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="section" id="features">
+      <div class="container">
+        <div class="section-header cd-reveal" style="--reveal-delay: 0ms; --reveal-y: 28px">
+          <div class="section-kicker">Why Fake GPS</div>
+          <h2 class="section-title">Why Use a Fake GPS Location?</h2>
+          <p class="section-sub">
+            From protecting your location privacy to testing location-aware Android apps without root, here is why people use a mock location changer and GPS route simulator.
+          </p>
+        </div>
+
+        <div class="bento-grid">
+          <!-- 1. Mask Your Location & Protect Privacy -->
+          <article class="bento-card span-6 cd-reveal" style="--reveal-delay: 0ms; --reveal-y: 28px">
+            <div>
+              <div class="usecase-head">
+                <div class="bento-tag">01 · Location Privacy</div>
+                <span class="usecase-icon" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                </span>
+              </div>
+              <h3>Mask your location and protect your privacy.</h3>
+              <p>
+                Prevent everyday apps, background trackers, and third-party services from logging your real-time physical coordinates. By masking your live GPS location on Android, you stay in control of when and where your true whereabouts are shared.
+              </p>
+            </div>
+          </article>
+
+          <!-- 2. Developer & QA Tester Niche -->
+          <article class="bento-card span-6 cd-reveal" style="--reveal-delay: 100ms; --reveal-y: 28px">
+            <div>
+              <div class="usecase-head">
+                <div class="bento-tag">02 · Developers &amp; QA Testers</div>
+                <span class="usecase-icon" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+                </span>
+              </div>
+              <h3>Test geofencing, navigation &amp; location-based apps.</h3>
+              <p>
+                Built for Android developers and QA engineers who need a clean mock location provider without root. Verify geofence entry and exit triggers, localized search results, delivery tracking, and multi-stop GPS route simulations with realistic corner slowdown, signal drift, and custom speeds—all from your desk.
+              </p>
+            </div>
+          </article>
+
+          <!-- 3. Pranking Friends -->
+          <article class="bento-card span-6 cd-reveal" style="--reveal-delay: 200ms; --reveal-y: 28px">
+            <div>
+              <div class="usecase-head">
+                <div class="bento-tag">03 · Social &amp; Fun</div>
+                <span class="usecase-icon" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+                </span>
+              </div>
+              <h3>Pranking friends with a live pin anywhere on Earth.</h3>
+              <p>
+                Surprise friends and family by dropping a fake GPS pin in Tokyo, Paris, or a remote island in one tap. Bookmark your favourite prank locations or set a scheduled auto-stop timer so your phone automatically switches back when you’re done.
+              </p>
+            </div>
+          </article>
+
+          <!-- 4. Access to Geo-Restricted Content -->
+          <article class="bento-card span-6 cd-reveal" style="--reveal-delay: 300ms; --reveal-y: 28px">
+            <div>
+              <div class="usecase-head">
+                <div class="bento-tag">04 · Global Discovery</div>
+                <span class="usecase-icon" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                </span>
+              </div>
+              <h3>Access geo-restricted content &amp; local services.</h3>
+              <p>
+                Explore region-specific app features, local directories, events, and location-based content before travelling to a new city or country—all by switching your device’s reported GPS location in seconds.
+              </p>
+            </div>
+          </article>
+        </div>
+
+        <!-- Responsible Use Disclaimer -->
+        <div class="usecase-disclaimer cd-reveal" style="--reveal-delay: 350ms; --reveal-y: 20px" role="note" aria-label="Responsible Use Disclaimer">
+          <span class="usecase-disclaimer-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          </span>
+          <p>
+            <strong>Disclaimer:</strong> It’s important to note that using such tools might violate the terms of service of certain apps or platforms, and in some cases, it may even be illegal, especially if used to deceive or bypass restrictions. Mappr is a tool you are responsible for when using it.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         FAQ Section
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="section faq-section" id="faq">
+      <div class="container">
+        <div class="section-header cd-reveal" style="--reveal-delay: 0ms; --reveal-y: 28px">
+          <div class="section-kicker">FAQ</div>
+          <h2 class="section-title">Frequently Asked Questions</h2>
+        </div>
+
+        <div class="faq-list" id="faq-list">
+          <div class="cd-reveal" style="--reveal-delay: 0ms; --reveal-y: 28px">
+            <div class="faq-item is-open">
+              <button type="button" class="faq-trigger" aria-expanded="true">
+                <h3>Does Mappr require an internet connection?</h3>
+                <span class="faq-chevron" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </span>
+              </button>
+              <div class="cd-faq-body open">
+                <div>
+                  <p class="faq-body">
+                    Certain features require an internet connection, like search and route. Saved routes and searches are stored on your device and can be accessed offline afterwards.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cd-reveal" style="--reveal-delay: 70ms; --reveal-y: 28px">
+            <div class="faq-item">
+              <button type="button" class="faq-trigger" aria-expanded="false">
+                <h3>Does it require Developer Options?</h3>
+                <span class="faq-chevron" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </span>
+              </button>
+              <div class="cd-faq-body">
+                <div>
+                  <p class="faq-body">
+                    Yes, and a proper setup guide is available for different OEMs.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cd-reveal" style="--reveal-delay: 140ms; --reveal-y: 28px">
+            <div class="faq-item">
+              <button type="button" class="faq-trigger" aria-expanded="false">
+                <h3>Does my device need to be rooted?</h3>
+                <span class="faq-chevron" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </span>
+              </button>
+              <div class="cd-faq-body">
+                <div>
+                  <p class="faq-body">
+                    No.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cd-reveal" style="--reveal-delay: 210ms; --reveal-y: 28px">
+            <div class="faq-item">
+              <button type="button" class="faq-trigger" aria-expanded="false">
+                <h3>Is my location stored server-side?</h3>
+                <span class="faq-chevron" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </span>
+              </button>
+              <div class="cd-faq-body">
+                <div>
+                  <p class="faq-body">
+                    No, nothing is stored server-side. You can see the privacy policy at <a href="https://raycode.me/Mappr/privacy.html" target="_blank" rel="noopener noreferrer" style="color:var(--primary);font-weight:600;text-decoration:underline;text-underline-offset:3px">https://raycode.me/Mappr/privacy.html</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Support Note -->
+        <div class="faq-contact-note cd-reveal" style="--reveal-delay: 280ms; --reveal-y: 16px">
+          Have questions, feedback, or need support? Reach out directly to <a href="mailto:rayyanmasterx@gmail.com">rayyanmasterx@gmail.com</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Bottom Call-to-Action Banner
+         ═══════════════════════════════════════════════════════════════════ -->
+    <section class="section">
+      <div class="container">
+        <div class="cta-banner cd-reveal" style="--reveal-delay: 0ms; --reveal-y: 28px">
+          <h2>Ready to take control of your location?</h2>
+          <p>
+            Download <strong>Mappr</strong> on Google Play for one-tap location changes, saved favourites, scheduled auto-stop, and realistic route simulation.
+          </p>
+          <div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap">
+            <a class="btn-primary" style="background:var(--surface);color:var(--on-primary-container);box-shadow:0 14px 30px rgba(0,0,0,0.22)" href="https://play.google.com/store/apps/details?id=com.raycode.mockloc&amp;utm_source=raycode.me&amp;utm_medium=referral&amp;utm_campaign=mappr_website&amp;utm_content=cta_banner" target="_blank" rel="noopener noreferrer">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 0 1 0 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/>
+              </svg>
+              <span>Get Mappr on Google Play</span>
+            </a>
+            <a class="btn-secondary" style="background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.28)" href="#hero-demo">
+              <span>Back to Top ↑</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Footer
+       ═══════════════════════════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div style="display:flex;align-items:center;gap:10px">
+        <img src="assets/icon.png" alt="Mappr" width="28" height="28" style="border-radius:7px">
+        <span><strong>Mappr</strong> · Fake GPS Location &amp; Route Simulator</span>
+      </div>
+      <div class="footer-links">
+        <a href="#hero-demo">Change Location</a>
+        <a href="#route-lab">Route Mode</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#features">Why Fake GPS</a>
+        <a href="#faq">FAQ</a>
+        <a href="mailto:rayyanmasterx@gmail.com" class="footer-email-link" aria-label="Contact Email">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          <span>rayyanmasterx@gmail.com</span>
+        </a>
+        <a href="https://play.google.com/store/apps/details?id=com.raycode.mockloc&amp;utm_source=raycode.me&amp;utm_medium=referral&amp;utm_campaign=mappr_website&amp;utm_content=footer" target="_blank" rel="noopener noreferrer">Google Play Store</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/mapengine.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/demo-location.js"></script>
+  <script src="js/demo-route.js"></script>
+  <script src="js/site.js"></script>
+</body>
+</html>
