@@ -92,10 +92,9 @@
     var docW = Math.max(260, (document.documentElement.clientWidth || global.innerWidth || 380) - 36);
     $$('.phone-fit').forEach(function (f) {
       if (f.closest && f.closest('#mobile-fs-modal')) {
-        var vp = document.getElementById('mobile-fs-viewport') || f.parentElement;
-        var padW = 28, padH = 16;
-        var availW = Math.max(220, (vp ? vp.clientWidth : global.innerWidth) - padW);
-        var availH = Math.max(320, (vp ? vp.clientHeight : (global.innerHeight - 80)) - padH);
+        var padW = 24, padH = 28;
+        var availW = Math.max(220, (global.innerWidth || 380) - padW);
+        var availH = Math.max(320, (global.innerHeight || 760) - padH);
         var fsS = clamp(Math.min(availW / 392, availH / 776), 0.4, 1.25);
         if (Math.abs((parseFloat(f.style.getPropertyValue('--s')) || 0) - fsS) > 0.002) {
           f.style.setProperty('--s', fsS.toFixed(4));

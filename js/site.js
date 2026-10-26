@@ -161,24 +161,17 @@
     /* 1e-fs. Mobile Full-Screen Interactive Phone Modal */
     var fsModal = document.getElementById('mobile-fs-modal');
     var fsSlot = document.getElementById('mobile-fs-slot');
-    var fsTitle = document.getElementById('mobile-fs-title');
     var fsCloseBtn = document.getElementById('mobile-fs-close');
     var currentActivePhone = null;
     var currentPlaceholder = null;
 
-    function openMobileFullscreen(stage, customTitle) {
+    function openMobileFullscreen(stage) {
       if (!fsModal || !fsSlot || !stage) return;
       var phoneFit = $('.phone-fit', stage);
       if (!phoneFit) return;
 
       if (typeof setMobileMenu === 'function') {
         setMobileMenu(false);
-      }
-
-      var screenEl = $('.screen', phoneFit);
-      var isRoute = screenEl && screenEl.id === 'phone-route';
-      if (fsTitle) {
-        fsTitle.textContent = customTitle || (isRoute ? 'Route Simulation · Interactive' : 'Change Location · Interactive');
       }
 
       // Preserve layout in-page with a matching invisible placeholder so nothing shifts
@@ -224,8 +217,7 @@
     $$('[data-fs-open]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var stage = btn.closest('.phone-stage');
-        var title = btn.getAttribute('data-fs-title');
-        openMobileFullscreen(stage, title);
+        openMobileFullscreen(stage);
       });
     });
 
@@ -235,7 +227,7 @@
 
     if (fsModal) {
       fsModal.addEventListener('click', function (e) {
-        if (e.target === fsModal || e.target.id === 'mobile-fs-viewport' || e.target.id === 'mobile-fs-slot') {
+        if (e.target === fsModal || e.target.id === 'mobile-fs-slot') {
           closeMobileFullscreen();
         }
       });
