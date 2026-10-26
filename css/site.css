@@ -92,8 +92,11 @@ body {
 }
 
 body.has-mobile-fs {
+  position: fixed;
+  left: 0;
+  right: 0;
+  width: 100%;
   overflow: hidden !important;
-  touch-action: none;
 }
 
 a {

@@ -1,6 +1,6 @@
 /*!
  * Mappr — Marketing Site Controller
- * Implements CallDO-style floating pill navigation states (unscrolled, scrolled,
+ * Implements floating pill navigation states (unscrolled, scrolled,
  * smart auto-hide on scroll down, active section IntersectionObserver, mobile drawer,
  * and top scroll progress bar) + initializes the map backdrop and interactive phones.
  */
@@ -158,12 +158,33 @@
     });
 
     /* 1e-fs. Mobile full-screen interactive phones (maps are scroll-locked in-page on touch) */
-    var fsOpen = null;
+    var fsOpen = null, fsSpacer = null, fsScrollY = 0;
     function setFullscreen(stage, on) {
       if (!stage) return;
-      stage.classList.toggle('is-mobile-fs', on);
-      document.body.classList.toggle('has-mobile-fs', on);
-      fsOpen = on ? stage : null;
+      var root = document.documentElement;
+      if (on) {
+        fsScrollY = global.pageYOffset || root.scrollTop || 0;
+        // keep the layout height so the page doesn't collapse/jump when the stage leaves the flow
+        fsSpacer = document.createElement('div');
+        fsSpacer.style.height = stage.offsetHeight + 'px';
+        fsSpacer.setAttribute('aria-hidden', 'true');
+        stage.parentNode.insertBefore(fsSpacer, stage);
+        stage.classList.add('is-mobile-fs');
+        // iOS-safe scroll lock: pin the body in place at the current offset
+        root.style.scrollBehavior = 'auto';
+        document.body.classList.add('has-mobile-fs');
+        document.body.style.top = (-fsScrollY) + 'px';
+        fsOpen = stage;
+      } else {
+        stage.classList.remove('is-mobile-fs');
+        document.body.classList.remove('has-mobile-fs');
+        document.body.style.top = '';
+        if (fsSpacer && fsSpacer.parentNode) fsSpacer.parentNode.removeChild(fsSpacer);
+        fsSpacer = null;
+        fsOpen = null;
+        global.scrollTo(0, fsScrollY);
+        root.style.scrollBehavior = '';
+      }
       U.fitPhones();
       global.dispatchEvent(new Event('resize'));
     }
